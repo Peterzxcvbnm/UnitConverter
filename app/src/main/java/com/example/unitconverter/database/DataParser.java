@@ -29,8 +29,7 @@ public class DataParser {
     private static String file_url = "https://raw.githubusercontent.com/qudt/qudt-public-repo/master/vocab/unit/VOCAB_QUDT-UNITS-ALL-v2.1.ttl";
 
     public void SeedDatabase(Context context) {
-        AppDatabase db = Room.databaseBuilder(context,
-                AppDatabase.class, "database-name").build();
+        AppDatabase db = AppDatabase.getInstance(context);
 
         Log.i("DB", "Before do in background");
             new DownloadFileFromURL().execute(db);

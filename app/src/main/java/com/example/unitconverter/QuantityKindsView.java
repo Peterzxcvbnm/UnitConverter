@@ -53,14 +53,13 @@ public class QuantityKindsView extends Fragment {
 
         mViewModel = new ViewModelProvider(this).get(QuantityKindsViewViewModel.class);
 
-        AppDatabase db = Room.databaseBuilder(context,
-                AppDatabase.class, "database-name").build();
+        AppDatabase db = AppDatabase.getInstance(context);
 
         Log.i("UI", "About to get quantityKinds");
         AsyncTask.execute(() ->{
             db.unitDao().getQuantityKinds().subscribe(q -> q.forEach(qk ->{
                 String[] quantityKindsArray = qk.split(",");
-                mViewModel.addQuantityKinds(new ArrayList<>(Arrays.asList(quantityKindsArray)));
+                mViewModel.addQuantityKinds(new ArrayList<String>(Arrays.asList(quantityKindsArray)));
             }), e -> {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
