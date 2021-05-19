@@ -15,6 +15,8 @@ import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -29,10 +31,9 @@ public class DataParser {
     public void SeedDatabase(Context context) {
         AppDatabase db = Room.databaseBuilder(context,
                 AppDatabase.class, "database-name").build();
-        UnitDao unitDao = db.unitDao();
-        if(unitDao.unitCount() == 0){
-            new DownloadFileFromURL().doInBackground(db);
-        }
+
+        Log.i("DB", "Before do in background");
+            new DownloadFileFromURL().execute(db);
     }
 
     /**
@@ -54,7 +55,13 @@ public class DataParser {
         @Override
         protected String doInBackground(AppDatabase... db) {
             int count;
+            Log.i("DB", "Start do in background");
             try {
+                UnitDao unitDao = db[0].unitDao();
+                if(unitDao.unitCount() != 0){
+                    Log.i("DB", "Unit table not empty");
+                    return null;
+                }
                 URL url = new URL(file_url);
                 URLConnection connection = url.openConnection();
                 connection.connect();
@@ -71,7 +78,7 @@ public class DataParser {
                 }
 
                 String[] contentbyLine = strFileContents.split("\n");
-
+                Log.i("DB", "Lines in file: " + contentbyLine.length);
                 List<Unit> units = new ArrayList<Unit>();
                 Unit currentUnit = new Unit();
                 Boolean skippingInitial = true;
@@ -80,20 +87,20 @@ public class DataParser {
                 int currentLineOfUnit = 0;
 
                 for (String line : contentbyLine) {
-                    if (skippingInitial && line != ".") {
+                    if (skippingInitial && !line.equals(".")) {
                         continue;
                     } else {
                         skippingInitial = false;
                     }
 
                     //Skip empty lines
-                    if (line.trim() == "") {
+                    if (line.trim().equals("")) {
                         currentLineOfUnit++;
                         continue;
                     }
 
                     //Dot indicates new element
-                    if (line == ".") {
+                    if (line.equals(".")) {
                         if (!skipTillNextDot) units.add(currentUnit);
                         skipTillNextDot = false;
                         isInDescription = false;
@@ -109,7 +116,8 @@ public class DataParser {
                         continue;
                     } else if (currentLineOfUnit == 0 && line.startsWith("unit:")) {
                         currentUnit = new Unit();
-                        currentUnit.systemName = line.substring(5);
+                        currentUnit.setQuantityKinds("");
+                        currentUnit.setSystemName(line.substring(5));
                         currentLineOfUnit++;
                         continue;
                     }
@@ -123,7 +131,7 @@ public class DataParser {
 
                     //Descriptions can have new lines, so we need a mechanism to deal with it
                     if (isInDescription) {
-                        currentUnit.description += " " + line;
+                        currentUnit.setDescription(currentUnit.getDescription() + " " + line);
                         currentLineOfUnit++;
                         continue;
                     }
@@ -131,30 +139,30 @@ public class DataParser {
                     //Read the element variable
                     switch (splitLine[2]) {
                         case "qudt:conversionMultiplier":
-                            currentUnit.conversionMultiplier = splitLine[3].length() > 15 ? Double.parseDouble(splitLine[3].substring(0, 16)) : Double.parseDouble(splitLine[3]);
+                            currentUnit.setConversionMultiplier(splitLine[3].length() > 15 ? Double.parseDouble(splitLine[3].substring(0, 16)) : Double.parseDouble(splitLine[3]));
                             break;
                         case "qudt:conversionOffset":
-                            currentUnit.conversionOffset = splitLine[3].length() > 15 ? Double.parseDouble(splitLine[3].substring(0, 16)) : Double.parseDouble(splitLine[3]);
+                            currentUnit.setConversionOffset(splitLine[3].length() > 15 ? Double.parseDouble(splitLine[3].substring(0, 16)) : Double.parseDouble(splitLine[3]));
                             break;
                         case "qudt:hasDimensionVector":
-                            currentUnit.DimensionVector = DimensionVector.parse(splitLine[3].substring(5));
+                            currentUnit.setDimensionVector(DimensionVector.parse(splitLine[3].substring(5)));
                             break;
                         case "qudt:symbol":
-                            currentUnit.symbol = splitLine[3].replace("\"", "");
+                            currentUnit.setSymbol(splitLine[3].replace("\"", ""));
                             break;
                         case "rdfs:label":
                             if (line.contains("@en-us")) break;
-                            currentUnit.unitName = line.replace("  rdfs:label \"", "").replace("\"@en ;", "");
+                            currentUnit.setUnitName(line.replace("  rdfs:label \"", "").replace("\"@en ;", ""));
                             break;
                         case "dcterms:description":
-                            currentUnit.description = line.replace("  dcterms:description ", "");
+                            currentUnit.setDescription(line.replace("  dcterms:description ", ""));
                             isInDescription = true;
                             break;
                         case "qudt:plainTextDescription":
-                            currentUnit.description = line.replace("  qudt:plainTextDescription ", "");
+                            currentUnit.setDescription(line.replace("  qudt:plainTextDescription ", ""));
                             break;
                         case "qudt:hasQuantityKind":
-                            currentUnit.quantityKinds.add(splitLine[3].replace("quantitykind:", ""));
+                            currentUnit.setQuantityKinds(currentUnit.getQuantityKinds() + "," + splitLine[3].replace("quantitykind:", ""));
                             break;
                     }
 
@@ -162,13 +170,15 @@ public class DataParser {
 
                 }
                 input.close();
-
-                units = units.stream().filter(u -> !u.getQuantityKinds().contains("Currency") && u.getSystemName().length() != 0).collect(Collectors.toList());
-
+                Log.i("DB", "Units b4 filter " + units.size());
+                units = units.stream().filter(u -> !u.getSplitQuantityKinds().contains("Currency") && u.getSystemName() != null && u.getSystemName().length() != 0).collect(Collectors.toList());
+                Log.i("DB", "Inserting units " + units.size());
                 db[0].unitDao().insertAll(Arrays.copyOf(units.toArray(), units.size(), Unit[].class));
-
             } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                Log.e("DB ERROR", e.getMessage() + sw.toString());
             }
 
             return null;

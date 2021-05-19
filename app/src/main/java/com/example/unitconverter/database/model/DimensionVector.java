@@ -1,5 +1,7 @@
 package com.example.unitconverter.database.model;
 
+import android.util.Log;
+
 public class DimensionVector {
 
     private short amountOfSubstance;
@@ -57,6 +59,38 @@ public class DimensionVector {
         return dimensionless;
     }
 
+    public void setAmountOfSubstance(short amountOfSubstance) {
+        this.amountOfSubstance = amountOfSubstance;
+    }
+
+    public void setElectricCurrent(short electricCurrent) {
+        this.electricCurrent = electricCurrent;
+    }
+
+    public void setLength(short length) {
+        this.length = length;
+    }
+
+    public void setLuminousIntensity(short luminousIntensity) {
+        this.luminousIntensity = luminousIntensity;
+    }
+
+    public void setMass(short mass) {
+        this.mass = mass;
+    }
+
+    public void setTemperature(short temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setTime(short time) {
+        this.time = time;
+    }
+
+    public void setDimensionless(short dimensionless) {
+        this.dimensionless = dimensionless;
+    }
+
     public static DimensionVector parse(String s)
     {
         DimensionVector v = new DimensionVector();
@@ -68,13 +102,13 @@ public class DimensionVector {
         int indexOfT = s.indexOf("T");
         int indexOfD = s.indexOf("D");
 
-        v.amountOfSubstance = Short.parseShort(s.substring(1, indexOfE - 1));
-        v.electricCurrent = Short.parseShort(s.substring(indexOfE + 1, indexOfL - indexOfE - 1));
-        v.length = Short.parseShort(s.substring(indexOfL + 1, indexOfI - indexOfL - 1));
-        v.luminousIntensity = Short.parseShort(s.substring(indexOfI + 1, indexOfM - indexOfI - 1));
-        v.mass = Short.parseShort(s.substring(indexOfM + 1, indexOfH - indexOfM - 1));
-        v.temperature = Short.parseShort(s.substring(indexOfH + 1, indexOfT - indexOfH - 1));
-        v.time = Short.parseShort(s.substring(indexOfT + 1, indexOfD - indexOfT - 1));
+        v.amountOfSubstance = Short.parseShort(s.substring(1, indexOfE));
+        v.electricCurrent = Short.parseShort(s.substring(indexOfE + 1, indexOfL));
+        v.length = Short.parseShort(s.substring(indexOfL + 1, indexOfI));
+        v.luminousIntensity = Short.parseShort(s.substring(indexOfI + 1, indexOfM));
+        v.mass = Short.parseShort(s.substring(indexOfM + 1, indexOfH));
+        v.temperature = Short.parseShort(s.substring(indexOfH + 1, indexOfT));
+        v.time = Short.parseShort(s.substring(indexOfT + 1, indexOfD));
         v.dimensionless = Short.parseShort(s.substring(indexOfD + 1));
 
         return v;
