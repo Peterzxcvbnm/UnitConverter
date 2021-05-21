@@ -107,4 +107,9 @@ public class Unit {
     public void setDimensionVector(com.example.unitconverter.database.model.DimensionVector dimensionVector) {
         DimensionVector = dimensionVector;
     }
+
+    @Override
+    public String toString() {
+        return unitName;
+    }
 }

@@ -24,6 +24,9 @@ public interface UnitDao {
     @Query("SELECT quantityKinds FROM unit")
     Single<List<String>> getQuantityKinds();
 
+    @Query("SELECT * FROM unit WHERE quantityKinds like :quantityKind")
+    Single<List<Unit>> getUnits(String quantityKind);
+
     @Insert
     void insertAll(Unit... units);
 }

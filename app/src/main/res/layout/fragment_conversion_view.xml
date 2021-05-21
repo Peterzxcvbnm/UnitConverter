@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ConversionView">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/convertFromTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/convert_from"
+            app:layout_constraintBottom_toTopOf="@+id/convertFromSpinner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <Spinner
+            android:id="@+id/convertFromSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/editTextConvertFrom"
+            app:layout_constraintTop_toBottomOf="@+id/convertFromTextView" />
+
+        <EditText
+            android:id="@+id/editTextConvertFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:ems="10"
+            android:hint="@string/from_value"
+            android:inputType="numberSigned|numberDecimal"
+            app:layout_constraintBottom_toTopOf="@+id/convertToTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/convertFromSpinner" />
+
+        <TextView
+            android:id="@+id/convertToTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/convert_to"
+            app:layout_constraintBottom_toTopOf="@+id/convertToSpinner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextConvertFrom"
+            app:layout_constraintVertical_chainStyle="packed" />
+        <Spinner
+            android:id="@+id/convertToSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/toValueTextView"
+            app:layout_constraintTop_toBottomOf="@+id/convertToTextView" />
+
+        <TextView
+            android:id="@+id/toValueTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="@string/to_value"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/convertToSpinner" />
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>

@@ -1,8 +1,12 @@
 package com.example.unitconverter;
 
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +51,13 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             super(view);
             mView = view;
             mContentView = (Button) view.findViewById(R.id.listItemButton);
+            mContentView.setOnClickListener(param -> {
+                Context context = view.getContext();
+                Intent conversionIntent = new Intent(context, ConversionActivity.class);
+                Log.i("SPINNER", "Setting intent text to: " + mContentView.getText());
+                conversionIntent.putExtra(Intent.EXTRA_TEXT, mContentView.getText());
+                context.startActivity(conversionIntent);
+            });
         }
 
         @Override

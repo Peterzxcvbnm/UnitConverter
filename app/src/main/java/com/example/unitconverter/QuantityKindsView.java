@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.unitconverter.database.AppDatabase;
 
@@ -30,6 +32,7 @@ public class QuantityKindsView extends Fragment {
 
     private QuantityKindsViewViewModel mViewModel;
     private Context context;
+    private Button chooseQuantityKindButton;
 
     public static QuantityKindsView newInstance() {
         return new QuantityKindsView();
@@ -51,7 +54,9 @@ public class QuantityKindsView extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = new ViewModelProvider(this).get(QuantityKindsViewViewModel.class);
+
+
+        mViewModel = QuantityKindsViewViewModel.getInstance();
 
         AppDatabase db = AppDatabase.getInstance(context);
 
@@ -78,13 +83,6 @@ public class QuantityKindsView extends Fragment {
         quantityKindList.setAdapter(adapter);
 
         quantityKindList.setLayoutManager(new LinearLayoutManager(context));
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(QuantityKindsViewViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

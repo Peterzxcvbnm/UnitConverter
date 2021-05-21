@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mViewModel = new ViewModelProvider(this).get(QuantityKindsViewViewModel.class);
+        mViewModel = QuantityKindsViewViewModel.getInstance();
 
 
     }

@@ -14,6 +14,29 @@ public class QuantityKindsViewViewModel extends ViewModel {
 
     private List<String> quantityKindList = new ArrayList<String>();
     private MutableLiveData<List<String>> quantityKinds;
+    private String selectedQuantityKind;
+
+    private MutableLiveData<Conversion> conversion = new MutableLiveData<>(new Conversion());
+
+    private static QuantityKindsViewViewModel instance = new QuantityKindsViewViewModel();
+
+    public static QuantityKindsViewViewModel getInstance() {return instance;}
+
+    public String getSelectedQuantityKind() {
+        return selectedQuantityKind;
+    }
+
+    public void setSelectedQuantityKind(String selectedQuantityKind) {
+        this.selectedQuantityKind = selectedQuantityKind;
+    }
+
+    public LiveData<Conversion> getConversion() {
+        return conversion;
+    }
+
+    public void postConversion(Conversion conversion) {
+        this.conversion.postValue(conversion);
+    }
 
     public MutableLiveData<List<String>> getQuantityKinds() {
         if (quantityKinds == null) {
