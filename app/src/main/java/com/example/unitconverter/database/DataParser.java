@@ -77,7 +77,6 @@ public class DataParser {
                 }
 
                 String[] contentbyLine = strFileContents.split("\n");
-                Log.i("DB", "Lines in file: " + contentbyLine.length);
                 List<Unit> units = new ArrayList<Unit>();
                 Unit currentUnit = new Unit();
                 Boolean skippingInitial = true;
@@ -169,9 +168,7 @@ public class DataParser {
 
                 }
                 input.close();
-                Log.i("DB", "Units b4 filter " + units.size());
                 units = units.stream().filter(u -> !u.getSplitQuantityKinds().contains("Currency") && u.getSystemName() != null && u.getSystemName().length() != 0).collect(Collectors.toList());
-                Log.i("DB", "Inserting units " + units.size());
                 db[0].unitDao().insertAll(Arrays.copyOf(units.toArray(), units.size(), Unit[].class));
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();

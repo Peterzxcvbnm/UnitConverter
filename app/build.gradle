@@ -41,6 +41,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.fragment:fragment:$fragment_version"
     implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.slidingpanelayout:slidingpanelayout:1.2.0-alpha02"
     annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation "androidx.startup:startup-runtime:1.0.0"
     implementation "androidx.room:room-rxjava2:$room_version"

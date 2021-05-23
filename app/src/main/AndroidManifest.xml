@@ -13,10 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UnitConverter">
 
-        <activity
-            android:name=".ConversionActivity"
-            android:label="@string/title_activity_conversion">
-        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

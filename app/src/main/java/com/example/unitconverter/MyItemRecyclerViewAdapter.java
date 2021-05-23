@@ -3,7 +3,9 @@ package com.example.unitconverter;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -53,10 +55,8 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             mContentView = (Button) view.findViewById(R.id.listItemButton);
             mContentView.setOnClickListener(param -> {
                 Context context = view.getContext();
-                Intent conversionIntent = new Intent(context, ConversionActivity.class);
-                Log.i("SPINNER", "Setting intent text to: " + mContentView.getText());
-                conversionIntent.putExtra(Intent.EXTRA_TEXT, mContentView.getText());
-                context.startActivity(conversionIntent);
+                QuantityKindsViewViewModel.getInstance().setSelectedQuantityKind(mContentView.getText().toString());
+                ((SlidingPaneLayout)((Activity) view.getContext()).findViewById(R.id.slidingPaneLayout)).open();
             });
         }
 

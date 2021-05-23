@@ -25,6 +25,8 @@ import com.example.unitconverter.database.AppDatabase;
 import com.example.unitconverter.database.DAOs.UnitDao;
 import com.example.unitconverter.database.model.Unit;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,6 +85,10 @@ public class ConversionView extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Connect the SlidingPaneLayout to the system back button.
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                getViewLifecycleOwner(),
+                new TwoPaneOnBackPressedCallback(getActivity().findViewById(R.id.slidingPaneLayout)));
         fromUnitSpinner = view.findViewById(R.id.convertFromSpinner);
         toUnitSpinner = view.findViewById(R.id.convertToSpinner);
         fromValueEditText = view.findViewById(R.id.editTextConvertFrom);
@@ -94,13 +100,12 @@ public class ConversionView extends Fragment implements AdapterView.OnItemSelect
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.i("CONVERT", "text changed to: " + s);
-                try{
-                Conversion conversion = mViewModel.getConversion().getValue();
-                conversion.setFromValue(Double.parseDouble(s.toString()));
-                mViewModel.postConversion(conversion);
-                }catch(NumberFormatException e){
-                    
+                try {
+                    Conversion conversion = mViewModel.getConversion().getValue();
+                    conversion.setFromValue(Double.parseDouble(s.toString()));
+                    mViewModel.postConversion(conversion);
+                } catch (NumberFormatException e) {
+
                 }
             }
 
@@ -111,35 +116,44 @@ public class ConversionView extends Fragment implements AdapterView.OnItemSelect
         });
         toValueTextView = getView().findViewById(R.id.toValueTextView);
         mViewModel.getConversion().observe(getViewLifecycleOwner(), conversion -> {
-            Log.i("CONVERT", "Conversion changed");
             toValueTextView.setText("" + conversion.getToValue());
         });
-        AsyncTask.execute(() ->{
-            UnitDao unitDao = AppDatabase.getInstance(context).unitDao();
-            List<Unit> units = unitDao.getUnits("%" + mViewModel.getSelectedQuantityKind() + "%").blockingGet();
-            units = units.stream().filter(u -> u.getSplitQuantityKinds().contains(mViewModel.getSelectedQuantityKind())).collect(Collectors.toList());
-            Conversion conversion = mViewModel.getConversion().getValue();
-            conversion.setFromUnit(units.get(0));
-            conversion.setToUnit(units.get(0));
-            mViewModel.postConversion(conversion);
-            ArrayAdapter<Unit> toAdapter = new ArrayAdapter<Unit>(context, android.R.layout.simple_spinner_item, units);
-            ArrayAdapter<Unit> fromAdapter = new ArrayAdapter<Unit>(context, android.R.layout.simple_spinner_item, units);
-            fromUnitSpinner.setAdapter(fromAdapter);
-            toUnitSpinner.setAdapter(toAdapter);
 
-            fromUnitSpinner.setOnItemSelectedListener(this);
-            toUnitSpinner.setOnItemSelectedListener(this);
+        mViewModel.getSelectedQuantityKind().observe(getViewLifecycleOwner(), quantityKind -> {
+            AsyncTask.execute(() -> {
+                UnitDao unitDao = AppDatabase.getInstance(context).unitDao();
+                List<Unit> units = unitDao.getUnits("%" + quantityKind + "%").blockingGet();
+                units = units.stream().filter(u -> u.getSplitQuantityKinds().contains(quantityKind)).collect(Collectors.toList());
+                if (units.size() > 0) {
+                    Conversion conversion = mViewModel.getConversion().getValue();
+                    conversion.setFromUnit(units.get(0));
+                    conversion.setToUnit(units.get(0));
+                    mViewModel.postConversion(conversion);
+                }
+
+                final List<Unit> finalUnits = units;
+
+                getActivity().runOnUiThread(() -> {
+                    ArrayAdapter<Unit> toAdapter = new ArrayAdapter<Unit>(context, android.R.layout.simple_spinner_item, finalUnits);
+                    ArrayAdapter<Unit> fromAdapter = new ArrayAdapter<Unit>(context, android.R.layout.simple_spinner_item, finalUnits);
+                    fromUnitSpinner.setAdapter(fromAdapter);
+                    toUnitSpinner.setAdapter(toAdapter);
+
+                    fromUnitSpinner.setOnItemSelectedListener(this);
+                    toUnitSpinner.setOnItemSelectedListener(this);
+                });
+            });
         });
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Conversion conversion = mViewModel.getConversion().getValue();
-        if(parent.getId() == R.id.convertFromSpinner){
+        if (parent.getId() == R.id.convertFromSpinner) {
             Unit unit = (Unit) parent.getItemAtPosition(position);
             conversion.setFromUnit(unit);
             mViewModel.postConversion(conversion);
-        }else{ //convertToSpinner
+        } else { //convertToSpinner
             Unit unit = (Unit) parent.getItemAtPosition(position);
             conversion.setToUnit(unit);
             mViewModel.postConversion(conversion);
